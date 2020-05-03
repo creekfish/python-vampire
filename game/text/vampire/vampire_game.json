@@ -1,0 +1,97 @@
+{
+  "items": [
+    {
+      "name": "Sign",
+      "actions": [
+        {
+          "name": "look",
+          "result": {
+            "text": "The Vampire Wakes at Midnight!"
+          }
+        }
+      ],
+      "fixed": false
+    },
+    {
+      "name": "Timepiece",
+      "actions": [
+        {
+          "name": "look",
+          "must_have": true,
+          "result": {
+            "text": "The time is {game_time}."
+          }
+        }
+      ],
+    },
+    {
+      "name": "Crate",
+      "actions": [
+        {
+          "name": "hit",
+          "must_have": true,
+          "result_not_have": "I don't see any Crate",
+          "partial_result": {
+            "text": "      -- With what? ",
+            "next_action": {
+              "name": "hit_with",
+
+            }
+          }
+        }
+      ],
+      "gettable": false
+    },
+
+  ],
+  "places": [
+    {
+      "name": "Entrance Hall",
+      "items": [
+        "Sign",
+        "Timepiece"
+      ]
+    },
+    {
+      "name": "Library",
+      "look": "A stone room, curiously lacking many books.",
+      "items": [
+        "Bookcase"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "start": "Entrance Hall",
+      "end": "Library",
+      "direction": "east",
+      "return_direction": null,   // return direction default is opposite of direction... set to null if cannot return...
+    }
+  ],
+  "directions": [
+    {
+      "name": "east",
+      "opposite": "west"
+    },
+    {
+      "name": "west",
+      "opposite": "east"
+    },
+    {
+      "name": "north",
+      "opposite": "south"
+    },
+    {
+      "name": "south",
+      "opposite": "north"
+    },
+    {
+      "name": "up",
+      "opposite": "down"
+    },
+    {
+      "name": "down",
+      "opposite": "up"
+    },
+  ]
+}
