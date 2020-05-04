@@ -7,7 +7,7 @@ from game.text.grammars import (
     GrammarUnknownThingError,
 )
 from game.text.things import Action, Actor, Player, Result, GameError, LookAction, InventoryAction, GoAction
-
+from game.text.vampire.directions import all_directions
 
 class GameNoInputError(GameError):
     def __str__(self):
@@ -146,7 +146,39 @@ class TextGameSinglePlayer:
 
     @property
     def game_actions(self) -> List[Action]:
-        return [
+        game_actions = [
             LookAction(),
             InventoryAction(),
         ]
+        game_actions.extend(self.get_direction_actions())
+        return game_actions
+
+    @staticmethod
+    def get_direction_actions():
+        def east(player):
+            return GoAction(direction=all_directions.lookup('east')).execute(player=player)
+
+        def west(player):
+            return GoAction(direction=all_directions.lookup('west')).execute(player=player)
+
+        def north(player):
+            return GoAction(direction=all_directions.lookup('north')).execute(player=player)
+
+        def south(player):
+            return GoAction(direction=all_directions.lookup('south')).execute(player=player)
+
+        def up(player):
+            return GoAction(direction=all_directions.lookup('up')).execute(player=player)
+
+        def down(player):
+            return GoAction(direction=all_directions.lookup('down')).execute(player=player)
+
+        direction_actions = [
+            Action(east, aliases=['e']),
+            Action(west, aliases=['w']),
+            Action(north, aliases=['n']),
+            Action(south, aliases=['s']),
+            Action(up, aliases=['u']),
+            Action(down, aliases=['d']),
+        ]
+        return direction_actions
