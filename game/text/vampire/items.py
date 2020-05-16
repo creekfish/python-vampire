@@ -1,7 +1,22 @@
+from abc import ABC
+
 from game.text.things import Item, Result, Action
+from game.text.vampire.actions import LookAction, GetAction, DropAction
 
 
-class Sign(Item):
+class VampireItem(Item, ABC):
+
+    @property
+    def _actions(self):
+        item_actions = [
+            LookAction(item=self),
+            GetAction(item=self),
+            DropAction(item=self),
+        ]
+        return super()._actions + item_actions
+
+
+class Sign(VampireItem):
 
     def __init__(self, game):
         super().__init__(game, 'Sign')
@@ -14,7 +29,7 @@ class Sign(Item):
         return 'The Vampire Wakes at Midnight!'
 
 
-class Timepiece(Item):
+class Timepiece(VampireItem):
 
     def __init__(self, game):
         super().__init__(game, 'Timepiece')
@@ -24,7 +39,7 @@ class Timepiece(Item):
         return f'The time is {self.game.time}.'
 
 
-class WoodenStakes(Item):
+class WoodenStakes(VampireItem):
 
     def __init__(self, game):
         super().__init__(game, 'Wooden Stakes', ['Stakes'])
@@ -35,7 +50,7 @@ class WoodenStakes(Item):
         return f'Wooden Stakes'
 
 
-class Crate(Item):
+class Crate(VampireItem):
 
     def __init__(self, game):
         super().__init__(game, 'Crate')

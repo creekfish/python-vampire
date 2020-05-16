@@ -31,7 +31,13 @@ class Result:
 
 
 A = TypeVar('A')
-T = TypeVar('T', 'Thing', 'Place', 'Item', 'Direction', 'Actor', 'Action')
+
+#TODO: use Type[T] instead ala https://stackoverflow.com/questions/55819918/python-type-annotation-for-a-function-that-accepts-a-type-and-returns-a-value-of
+#TODO: no, but the line below should work?
+#T = TypeVar('T', 'Thing', 'Place', 'Item', 'Direction', 'Actor', 'Action')
+T = TypeVar('T', bound='Thing')
+
+#TODO: why use generics at all, can we not just say class IndexOfThings(Index[AnyStr, 'Thing']):
 
 
 class Index(MutableMapping, Generic[AnyStr, A]):
@@ -133,7 +139,7 @@ class Thing(ABC):
 
 
 class ActionableThing(Thing, ABC):
-    def get_action(self, name):
+    def get_action(self, name) -> 'Action':
         return self.actions.lookup(name)
 
     @property
@@ -177,7 +183,7 @@ class ItemContainerThing(Thing, ABC):
         return self.has_item(item)
 
 
-class Direction(Thing):
+class Direction(Thing, ABC):
     def __init__(self, name, aliases=None):
         super().__init__(game=None, name=name, aliases=aliases)
         self.opposite = None
@@ -191,30 +197,18 @@ class Direction(Thing):
         return direction, opposite_direction
 
     def get_action(self, name):
-        if name == 'go':
-            return GoAction(direction=self)
-        else:
-            raise KeyError()
+        raise KeyError()
 
     def __str__(self):
         return f'{self.__class__.__name__}({self.name})'
 
 
-class Item(ActionableThing, DescribableThing):
+class Item(ActionableThing, DescribableThing, ABC):
     def __init__(self, game, name, aliases=None):
         super().__init__(game=game, name=name, aliases=aliases)
         self.is_fixed = False
         self.must_possess = True
         self.must_be_in_location = True
-
-    @property
-    def _actions(self):
-        item_actions = [
-            LookAction(item=self),
-            GetAction(item=self),
-            DropAction(item=self),
-        ]
-        return super()._actions + item_actions
 
 
 class Place(ItemContainerThing, DescribableThing):
@@ -308,16 +302,6 @@ class ActionRequiresItemInLocationError(ActionOnItemError):
         return f"I don't see any {self.thing.name}"
 
 
-class GetActionItemIsFixedInPlace(ActionOnItemError):
-    def __str__(self):
-        return "You can't get it"
-
-
-class GoActionItemNoConnectionToDestination(ActionError):
-    def __str__(self):
-        return "You can't go there"
-
-
 class Action(Thing):
 
     def __init__(self, strategy: Callable[[Player], Result], item: Item=None, aliases=None):
@@ -334,77 +318,10 @@ class Action(Thing):
 
     def validate_player_can_execute(self, player: Player):
         if self.item is not None:
-            if type(self) is not GetAction and self.item.must_possess and not player.has(self.item):
+            if self.item.must_possess and not player.has(self.item):
                 raise ActionRequiresItemPossessionError(self.item)
             if not self.item.must_possess and self.item.must_be_in_location and not player.location.has(self.item):
                 raise ActionRequiresItemInLocationError(self.item)
 
     def next_action(self) -> 'Action':
         pass
-
-
-class LookAction(Action):
-
-    def __init__(self, item: Item=None):
-        def look(player: Player) -> Result:
-            if item is None:
-                description = player.location.description
-            else:
-                description = item.description
-            return Result(description)
-        super().__init__(strategy=look, item=item, aliases=['read'])
-
-
-class GetAction(Action):
-
-    def __init__(self, item: Item):
-        def get(player: Player) -> Result:
-            player.get(item)
-            return Result(f'OK, you got the {item.name}')
-        super().__init__(strategy=get, item=item)
-
-    def validate_player_can_execute(self, player: Player):
-        if player.has(self.item):
-            raise ActionRequiresItemInLocationError(self.item)
-        super().validate_player_can_execute(player)
-        if self.item.is_fixed:
-            raise GetActionItemIsFixedInPlace(self.item)
-
-
-class DropAction(Action):
-
-    def __init__(self, item: Item):
-        def drop(player: Player) -> Result:
-            player.drop(item)
-            return Result(f'The {item.name} is on the {player.location.name} floor')
-        super().__init__(strategy=drop, item=item)
-
-    def validate_player_can_execute(self, player: Player):
-        if not player.has(self.item):
-            raise ActionRequiresItemPossessionError(self.item)
-        super().validate_player_can_execute(player)
-
-
-class InventoryAction(Action):
-
-    def __init__(self):
-        def inventory(player: Player) -> Result:
-            inventory_list = ', '.join(item.name for item in player.inventory)
-            if inventory_list == '':
-                inventory_list = 'nothing'
-            return Result(f'You are carrying: {inventory_list}')
-        super().__init__(strategy=inventory, item=None)
-
-
-class GoAction(Action):
-
-    def __init__(self, direction: Direction):
-        def go(player: Player) -> Result:
-            destination = player.location.get_exit_destination(direction)
-            if destination is not None:
-                player.location = player.location.get_exit_destination(direction)
-#TODO: next action is Look... or just hardcode that here?
-                return LookAction().execute(player=player)
-            else:
-                raise GoActionItemNoConnectionToDestination()
-        super().__init__(strategy=go, item=None)

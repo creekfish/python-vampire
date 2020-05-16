@@ -6,8 +6,10 @@ from game.text.grammars import (
     GrammarUnknownActionError,
     GrammarUnknownThingError,
 )
-from game.text.things import Action, Actor, Player, Result, GameError, LookAction, InventoryAction, GoAction
+from game.text.things import Action, Actor, Player, Result, GameError
+from game.text.vampire.actions import LookAction, InventoryAction, GoAction
 from game.text.vampire.directions import all_directions
+
 
 class GameNoInputError(GameError):
     def __str__(self):
