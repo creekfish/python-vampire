@@ -1,7 +1,7 @@
 from abc import ABC
 
 from game.text.things import Item, Result, Action
-from game.text.vampire.actions import LookAction, GetAction, DropAction
+from game.text.actions import LookAction, GetAction, DropAction
 
 
 class VampireItem(Item, ABC):

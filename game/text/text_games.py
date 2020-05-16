@@ -6,8 +6,8 @@ from game.text.grammars import (
     GrammarUnknownActionError,
     GrammarUnknownThingError,
 )
-from game.text.things import Action, Actor, Player, Result, GameError
-from game.text.vampire.actions import LookAction, InventoryAction, GoAction
+from game.text.things import Action, Actor, Player, GameError
+from game.text.actions import LookAction, InventoryAction, GoAction
 from game.text.vampire.directions import all_directions
 
 

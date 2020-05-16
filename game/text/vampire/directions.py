@@ -1,5 +1,5 @@
 from game.text.things import Direction, IndexOfThings
-from game.text.vampire.actions import GoAction
+from game.text.actions import GoAction
 
 
 class VampireDirection(Direction):

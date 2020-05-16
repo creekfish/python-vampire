@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from game.text.things import Item, Player
-from game.text.vampire.actions import LookAction, GetAction, DropAction, InventoryAction
+from game.text.actions import LookAction, GetAction, DropAction, InventoryAction
 from tests import GameTestCase
 
 
