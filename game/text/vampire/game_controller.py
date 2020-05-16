@@ -45,7 +45,7 @@ class Vampire(TextGameSinglePlayer):
                 ),
                 places.Library(
                     self,
-                    items=[items.Crate(self)]
+                    items=[items.Crate(self), items.BrickFireplace(self)]
                 ),
             ]
             self._places = IndexOfThings(list_of_places)

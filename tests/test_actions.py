@@ -26,6 +26,14 @@ class TestLookAtItemAction(GameTestCase):
         self.player_mock.location.has.return_value = True
         self.assertEqual('A color out of space', str(self.action.execute(player=self.player_mock)))
 
+    def test__execute__returns_you_see_nothing_special__when_item_description_is_none(self):
+        self.item_mock.must_possess = False
+        self.item_mock.must_be_in_location = True
+        self.player_mock.has.return_value = False
+        self.player_mock.location.has.return_value = True
+        self.item_mock.description = None
+        self.assertEqual('You see nothing special', str(self.action.execute(player=self.player_mock)))
+
     def test__execute__raises_message_i_dont_see_any__when_possession_not_required_and_item_not_in_player_location(self):
         self.item_mock.must_possess = False
         self.item_mock.must_be_in_location = True

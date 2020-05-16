@@ -152,9 +152,9 @@ class ActionableThing(Thing, ABC):
         return IndexOfThings(self._actions)
 
 
-class DescribableThing(Thing, ABC):
+class DescribableThing(Thing):
+
     @property
-    @abstractmethod
     def description(self):
         return None
 

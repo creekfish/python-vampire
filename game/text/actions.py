@@ -29,6 +29,8 @@ class LookAction(Action):
                 description = player.location.description
             else:
                 description = item.description
+            if description is None:
+                description = 'You see nothing special'
             return Result(description)
         super().__init__(strategy=look, item=item, aliases=['read'])
 
